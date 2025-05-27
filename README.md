@@ -111,9 +111,11 @@ app/
 ### Available Scripts
 
 - `npm run dev` - Start development server with hot reload
-- `npm run build` - Build the application for production
+- `npm run build` - Build the application for production (SSR mode)
+- `npm run build:static` - Build the application for static deployment (SPA mode)
 - `npm run start` - Start the production server
 - `npm run typecheck` - Run TypeScript type checking
+- `npm run preview` - Preview the built application locally
 
 ## Usage Guide
 
@@ -191,6 +193,39 @@ This application supports all modern browsers including:
 - Firefox 88+
 - Safari 14+
 - Edge 90+
+
+## Deployment
+
+This application is configured for automatic deployment to GitHub Pages using GitHub Actions.
+
+### GitHub Pages Setup
+
+1. **Enable GitHub Pages** in your repository settings:
+
+   - Go to Settings → Pages
+   - Set Source to "GitHub Actions"
+
+2. **Push to main branch** - The deployment will happen automatically via GitHub Actions
+
+3. **Access your deployed app** at: `https://yourusername.github.io/f1-task/`
+
+### Manual Deployment
+
+To deploy manually or to other static hosting services:
+
+```bash
+# Build for static deployment
+npm run build:static
+
+# The build output will be in ./build/client/
+# Upload this directory to your hosting service
+```
+
+### Configuration
+
+- **Base Path**: The app is configured with base path `/f1-task/` for GitHub Pages
+- **SPA Mode**: The app runs in Single Page Application mode for static hosting
+- **Build Output**: Static files are generated in `./build/client/`
 
 ## Contributing
 
