@@ -207,7 +207,7 @@ This application is configured for automatic deployment to GitHub Pages using Gi
 
 2. **Push to main branch** - The deployment will happen automatically via GitHub Actions
 
-3. **Access your deployed app** at: `https://yourusername.github.io/f1-task/`
+3. **Access your deployed app** at: `https://atout811.github.io/incorta-f1/`
 
 ### Manual Deployment
 
@@ -248,4 +248,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ---
 
-Built with ❤️ for Formula 1 enthusiasts
+Built with ❤️ for Incorta Task
