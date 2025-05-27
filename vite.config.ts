@@ -1,12 +1,12 @@
-import { reactRouter } from "@react-router/dev/vite";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
+import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   base: "/incorta-f1/", // GitHub Pages base path (repository name)
-  plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
+  plugins: [tailwindcss(), react(), tsconfigPaths()],
   build: {
-    outDir: "dist", // Output directory for GitHub Pages
+    outDir: "build/client", // Keep same output directory for GitHub Actions
   },
 });
