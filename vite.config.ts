@@ -4,7 +4,7 @@ import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
-  base: "/f1-task/", // GitHub Pages base path (repository name)
+  base: "/incorta-f1/", // GitHub Pages base path (repository name)
   plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
   build: {
     outDir: "dist", // Output directory for GitHub Pages
