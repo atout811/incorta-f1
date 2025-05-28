@@ -211,13 +211,37 @@ This application integrates with the **Ergast F1 API** (https://ergast.com/mrd/)
 
 ## 🚀 Deployment
 
-### GitHub Pages (Recommended)
-The app is pre-configured for GitHub Pages deployment:
+### Vercel (Recommended for Production)
+The app is optimized for Vercel deployment with automatic SPA routing:
 
+1. **Connect Repository** to Vercel
+2. **Import Project** - Vercel auto-detects Vite configuration
+3. **Deploy** - Automatic builds on every push to main
+4. **Access** your app at your Vercel domain
+
+**Configuration:**
+- ✅ `vercel.json` handles SPA routing rewrites
+- ✅ Root path deployment (`/`)
+- ✅ Static asset caching optimized
+- ✅ Automatic builds and deployments
+
+### GitHub Pages (Alternative)
+For GitHub Pages deployment, use the `gh-pages` branch:
+
+```bash
+# Switch to GitHub Pages configuration
+git checkout gh-pages  # If you have a separate branch for GitHub Pages
+
+# Or modify for GitHub Pages:
+# 1. Set base: "/incorta-f1/" in vite.config.ts
+# 2. Add basename="/incorta-f1" to BrowserRouter in main.tsx
+```
+
+**GitHub Pages Setup:**
 1. **Enable GitHub Pages** in repository settings
 2. **Set source** to "GitHub Actions"
 3. **Push to main branch** - automatic deployment via GitHub Actions
-4. **Access** your app at: `https://username.github.io/f1-task/`
+4. **Access** your app at: `https://username.github.io/incorta-f1/`
 
 ### Manual Deployment
 ```bash
@@ -229,9 +253,22 @@ npm run build
 ```
 
 ### Environment Configuration
-- **Base Path**: Configured for GitHub Pages (`/incorta-f1/`)
+- **Vercel**: Root path deployment with SPA routing
+- **GitHub Pages**: Subdirectory deployment (`/incorta-f1/`)
 - **SPA Mode**: Single Page Application routing
 - **Static Assets**: Optimized bundle with code splitting
+
+### Troubleshooting Deployment Issues
+
+**Vercel 404 Errors:**
+- ✅ Ensure `vercel.json` exists with SPA rewrites
+- ✅ Remove basename from BrowserRouter
+- ✅ Set `base: "/"` in vite.config.ts
+
+**GitHub Pages Issues:**
+- ✅ Set correct base path in vite.config.ts
+- ✅ Add basename to BrowserRouter
+- ✅ Enable GitHub Pages in repository settings
 
 ## 🤝 Contributing
 

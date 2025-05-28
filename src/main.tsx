@@ -14,7 +14,7 @@ if (!container) {
 const root = createRoot(container);
 root.render(
   <StrictMode>
-    <BrowserRouter basename="/incorta-f1">
+    <BrowserRouter>
       <App />
     </BrowserRouter>
   </StrictMode>
