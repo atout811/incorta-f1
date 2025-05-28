@@ -4,21 +4,23 @@
     <meta charset="utf-8">
     <title>F1 Explorer</title>
     <script>
-        // Single Page Apps for GitHub Pages
-        // https://github.com/rafgraph/spa-github-pages
-        // This script checks to see if a redirect is present in the query string,
-        // converts it back into the correct url and adds it to the browser's history
-        (function(l) {
-            if (l.search[1] === '/' ) {
-                var decoded = decodeURIComponent(l.search.slice(1));
-                window.history.replaceState(null, null,
-                    l.pathname.slice(0, -1) + decoded + l.hash
-                );
-            }
-        }(window.location))
+        // GitHub Pages SPA redirect
+        // Store the current path in sessionStorage and redirect to index
+        var currentPath = window.location.pathname;
+        var search = window.location.search;
+        var hash = window.location.hash;
+        
+        // Store the intended route for the React app to pick up
+        sessionStorage.setItem('redirectPath', currentPath + search + hash);
+        
+        // Redirect to the base URL
+        window.location.replace('/incorta-f1/');
     </script>
 </head>
 <body>
-    <!-- This will redirect to the main app -->
+    <div style="text-align: center; padding: 50px; font-family: Arial, sans-serif;">
+        <h1>Redirecting...</h1>
+        <p>Please wait while we redirect you to the F1 Explorer.</p>
+    </div>
 </body>
 </html> 
