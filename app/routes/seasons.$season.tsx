@@ -6,8 +6,7 @@ import { ViewToggle } from "../components/ViewToggle";
 import { RaceCard } from "../components/RaceCard";
 import { RaceListItem } from "../components/RaceListItem";
 import { f1Api, type Race } from "../services/api";
-import { usePinnedRaces } from "../hooks/usePinnedRaces";
-import { usePersistentState } from "../components/PersistentStateProvider";
+import { useAppState } from "../hooks/usePinnedRaces";
 import { ArrowLeft, Calendar, Trophy, Target, Timer, Pin } from "lucide-react";
 
 export function meta({ params }: { params: { season: string } }) {
@@ -28,8 +27,7 @@ export default function SeasonDetails() {
   const [error, setError] = useState<string | null>(null);
   const [isVisible, setIsVisible] = useState(false);
 
-  const { isPinned, isHydrated } = usePinnedRaces();
-  const { setLastVisitedSeason } = usePersistentState();
+  const { setLastVisitedSeason } = useAppState();
 
   // Animation trigger
   useEffect(() => {
@@ -66,20 +64,10 @@ export default function SeasonDetails() {
 
   // Get sorted races with pinned ones first
   const sortedRaces = useMemo(() => {
-    if (!isHydrated) return races;
-
     return [...races].sort((a, b) => {
-      const aIsPinned = isPinned(a.season, a.round);
-      const bIsPinned = isPinned(b.season, b.round);
-
-      // Pinned races come first
-      if (aIsPinned && !bIsPinned) return -1;
-      if (!aIsPinned && bIsPinned) return 1;
-
-      // Then sort by round number
       return parseInt(a.round) - parseInt(b.round);
     });
-  }, [races, isPinned, isHydrated]);
+  }, [races]);
 
   if (loading) {
     return (
@@ -110,6 +98,17 @@ export default function SeasonDetails() {
       </div>
     );
   }
+
+  const currentDate = new Date();
+  const upcomingRaces = races.filter((race) => {
+    const raceDate = new Date(`${race.date}T${race.time || "00:00:00"}`);
+    return raceDate > currentDate;
+  });
+
+  const completedRaces = races.filter((race) => {
+    const raceDate = new Date(`${race.date}T${race.time || "00:00:00"}`);
+    return raceDate <= currentDate;
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-red-900 to-black">
@@ -171,22 +170,6 @@ export default function SeasonDetails() {
                 </span>
                 <span className="text-gray-300 ml-2">in {season}</span>
               </div>
-              {isHydrated &&
-                sortedRaces.some((race) =>
-                  isPinned(race.season, race.round)
-                ) && (
-                  <div className="flex items-center bg-gradient-to-r from-yellow-500/20 to-orange-500/20 backdrop-blur-sm border border-yellow-400/30 rounded-full px-6 py-3">
-                    <Pin className="w-5 h-5 text-yellow-400 mr-2" />
-                    <span className="text-sm font-bold text-yellow-400">
-                      {
-                        sortedRaces.filter((race) =>
-                          isPinned(race.season, race.round)
-                        ).length
-                      }{" "}
-                      PINNED
-                    </span>
-                  </div>
-                )}
             </div>
             <ViewToggle view={racesView} onViewChange={setRacesView} />
           </div>

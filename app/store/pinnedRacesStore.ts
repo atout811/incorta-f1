@@ -15,8 +15,23 @@ export interface PinnedRace {
   pinnedAt: number; // timestamp for sorting
 }
 
-interface PinnedRacesState {
+interface AppState {
+  // Pinned races state
   pinnedRaces: PinnedRace[];
+
+  // Navigation state
+  lastVisitedSeason: string | null;
+  lastVisitedRace: { season: string; round: string } | null;
+
+  // App initialization state
+  isAppInitialized: boolean;
+  isAppReady: boolean;
+
+  // UI preferences
+  preferredView: "grid" | "list";
+  itemsPerPage: number;
+
+  // Pinned races actions
   isPinned: (season: string, round: string) => boolean;
   pinRace: (race: PinnedRace) => void;
   unpinRace: (season: string, round: string) => void;
@@ -24,14 +39,37 @@ interface PinnedRacesState {
   clearAllPinned: () => void;
   getPinnedCount: () => number;
   getPinnedRacesForSeason: (season: string) => PinnedRace[];
+
+  // Navigation actions
+  setLastVisitedSeason: (season: string | null) => void;
+  setLastVisitedRace: (race: { season: string; round: string } | null) => void;
+
+  // App initialization actions
+  setIsAppInitialized: (initialized: boolean) => void;
+  setIsAppReady: (ready: boolean) => void;
+
+  // UI preference actions
+  setPreferredView: (view: "grid" | "list") => void;
+  setItemsPerPage: (count: number) => void;
+
+  // Reset actions
+  resetState: () => void;
 }
 
-export const usePinnedRacesStore = create<PinnedRacesState>()(
+export const useAppStore = create<AppState>()(
   subscribeWithSelector(
     persist(
       (set, get) => ({
+        // Initial state
         pinnedRaces: [],
+        lastVisitedSeason: null,
+        lastVisitedRace: null,
+        isAppInitialized: false,
+        isAppReady: false,
+        preferredView: "grid",
+        itemsPerPage: 24,
 
+        // Pinned races actions
         isPinned: (season: string, round: string) => {
           const state = get();
           return state.pinnedRaces.some(
@@ -89,9 +127,51 @@ export const usePinnedRacesStore = create<PinnedRacesState>()(
         clearAllPinned: () => {
           set({ pinnedRaces: [] });
         },
+
+        // Navigation actions
+        setLastVisitedSeason: (season: string | null) => {
+          set({ lastVisitedSeason: season });
+        },
+
+        setLastVisitedRace: (
+          race: { season: string; round: string } | null
+        ) => {
+          set({ lastVisitedRace: race });
+        },
+
+        // App initialization actions
+        setIsAppInitialized: (initialized: boolean) => {
+          set({ isAppInitialized: initialized });
+        },
+
+        setIsAppReady: (ready: boolean) => {
+          set({ isAppReady: ready });
+        },
+
+        // UI preference actions
+        setPreferredView: (view: "grid" | "list") => {
+          set({ preferredView: view });
+        },
+
+        setItemsPerPage: (count: number) => {
+          set({ itemsPerPage: count });
+        },
+
+        // Reset actions
+        resetState: () => {
+          set({
+            pinnedRaces: [],
+            lastVisitedSeason: null,
+            lastVisitedRace: null,
+            isAppInitialized: false,
+            isAppReady: false,
+            preferredView: "grid",
+            itemsPerPage: 24,
+          });
+        },
       }),
       {
-        name: "f1-pinned-races",
+        name: "f1-app-state",
         storage: createJSONStorage(() => {
           // More robust storage handling
           if (typeof window !== "undefined" && window.localStorage) {
@@ -128,6 +208,15 @@ export const usePinnedRacesStore = create<PinnedRacesState>()(
           };
         }),
         version: 1,
+        // Only persist certain parts of the state
+        partialize: (state) => ({
+          pinnedRaces: state.pinnedRaces,
+          lastVisitedSeason: state.lastVisitedSeason,
+          lastVisitedRace: state.lastVisitedRace,
+          preferredView: state.preferredView,
+          itemsPerPage: state.itemsPerPage,
+          // Don't persist app initialization states
+        }),
         // Add migration logic if needed in the future
         migrate: (persistedState: any, version: number) => {
           if (version === 0) {
@@ -139,3 +228,6 @@ export const usePinnedRacesStore = create<PinnedRacesState>()(
     )
   )
 );
+
+// Keep the old export for backward compatibility during transition
+export const usePinnedRacesStore = useAppStore;

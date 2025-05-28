@@ -1,8 +1,8 @@
 import { useEffect, useState, useCallback } from "react";
-import { usePinnedRacesStore } from "../store/pinnedRacesStore";
+import { useAppStore } from "../store/pinnedRacesStore";
 
 export function usePinnedRaces() {
-  const store = usePinnedRacesStore();
+  const store = useAppStore();
   const [isHydrated, setIsHydrated] = useState(false);
 
   // Check hydration status
@@ -10,8 +10,10 @@ export function usePinnedRaces() {
     let mounted = true;
 
     const checkHydration = () => {
-      if (mounted && usePinnedRacesStore.persist.hasHydrated()) {
+      if (mounted && useAppStore.persist.hasHydrated()) {
         setIsHydrated(true);
+        // Mark app as initialized when store is hydrated
+        store.setIsAppInitialized(true);
       }
     };
 
@@ -19,9 +21,10 @@ export function usePinnedRaces() {
     checkHydration();
 
     // Listen for hydration completion
-    const unsubscribe = usePinnedRacesStore.persist.onFinishHydration(() => {
+    const unsubscribe = useAppStore.persist.onFinishHydration(() => {
       if (mounted) {
         setIsHydrated(true);
+        store.setIsAppInitialized(true);
       }
     });
 
@@ -29,6 +32,7 @@ export function usePinnedRaces() {
     const timeout = setTimeout(() => {
       if (mounted) {
         setIsHydrated(true);
+        store.setIsAppInitialized(true);
       }
     }, 1000);
 
@@ -37,7 +41,7 @@ export function usePinnedRaces() {
       unsubscribe?.();
       clearTimeout(timeout);
     };
-  }, []);
+  }, [store]);
 
   // Memoized functions to prevent unnecessary re-renders
   const isPinned = useCallback(
@@ -93,5 +97,68 @@ export function usePinnedRaces() {
     getPinnedCount,
     getPinnedRacesForSeason,
     clearAllPinned: store.clearAllPinned,
+  };
+}
+
+// New hook to replace usePersistentState from Context
+export function useAppState() {
+  const store = useAppStore();
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const checkHydration = () => {
+      if (mounted && useAppStore.persist.hasHydrated()) {
+        setIsHydrated(true);
+        store.setIsAppInitialized(true);
+      }
+    };
+
+    checkHydration();
+
+    const unsubscribe = useAppStore.persist.onFinishHydration(() => {
+      if (mounted) {
+        setIsHydrated(true);
+        store.setIsAppInitialized(true);
+      }
+    });
+
+    const timeout = setTimeout(() => {
+      if (mounted) {
+        setIsHydrated(true);
+        store.setIsAppInitialized(true);
+      }
+    }, 1000);
+
+    return () => {
+      mounted = false;
+      unsubscribe?.();
+      clearTimeout(timeout);
+    };
+  }, [store]);
+
+  return {
+    // App state
+    isAppInitialized: isHydrated ? store.isAppInitialized : false,
+    isAppReady: store.isAppReady,
+    isHydrated,
+
+    // Navigation state
+    lastVisitedSeason: store.lastVisitedSeason,
+    lastVisitedRace: store.lastVisitedRace,
+
+    // UI preferences
+    preferredView: store.preferredView,
+    itemsPerPage: store.itemsPerPage,
+
+    // Actions
+    setLastVisitedSeason: store.setLastVisitedSeason,
+    setLastVisitedRace: store.setLastVisitedRace,
+    setIsAppInitialized: store.setIsAppInitialized,
+    setIsAppReady: store.setIsAppReady,
+    setPreferredView: store.setPreferredView,
+    setItemsPerPage: store.setItemsPerPage,
+    resetState: store.resetState,
   };
 }
