@@ -24,13 +24,9 @@ interface AppState {
   itemsPerPage: number;
 
   // Pinned races actions
-  isPinned: (season: string, round: string) => boolean;
   pinRace: (race: PinnedRace) => void;
   unpinRace: (season: string, round: string) => void;
-  getPinnedRaces: () => PinnedRace[];
   clearAllPinned: () => void;
-  getPinnedCount: () => number;
-  getPinnedRacesForSeason: (season: string) => PinnedRace[];
 
   // UI preference actions
   setPreferredView: (view: "grid" | "list") => void;
@@ -50,13 +46,6 @@ export const useAppStore = create<AppState>()(
         itemsPerPage: 24,
 
         // Pinned races actions
-        isPinned: (season: string, round: string) => {
-          const state = get();
-          return state.pinnedRaces.some(
-            (race) => race.season === season && race.round === round
-          );
-        },
-
         pinRace: (race: PinnedRace) => {
           set((state) => {
             // Check if already pinned
@@ -84,24 +73,6 @@ export const useAppStore = create<AppState>()(
               (race) => !(race.season === season && race.round === round)
             ),
           }));
-        },
-
-        getPinnedRaces: () => {
-          const state = get();
-          // Sort by pinned date (most recent first)
-          return [...state.pinnedRaces].sort((a, b) => b.pinnedAt - a.pinnedAt);
-        },
-
-        getPinnedCount: () => {
-          const state = get();
-          return state.pinnedRaces.length;
-        },
-
-        getPinnedRacesForSeason: (season: string) => {
-          const state = get();
-          return state.pinnedRaces
-            .filter((race) => race.season === season)
-            .sort((a, b) => parseInt(a.round) - parseInt(b.round));
         },
 
         clearAllPinned: () => {
@@ -182,4 +153,5 @@ export const useAppStore = create<AppState>()(
   )
 );
 
+// Keep the old export for backward compatibility during transition if needed
 export const usePinnedRacesStore = useAppStore;

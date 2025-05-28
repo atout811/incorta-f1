@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import { useMemo } from "react";
 import { Calendar, Trophy, Pin, Flag, Zap } from "lucide-react";
 import { useAppStore } from "../store/pinnedRacesStore";
 import { RaceListItem } from "../components/RaceListItem";
@@ -15,8 +16,11 @@ export function meta() {
 }
 
 export default function Home() {
-  const getPinnedRaces = useAppStore((state) => state.getPinnedRaces);
-  const pinnedRaces = getPinnedRaces();
+  const pinnedRacesData = useAppStore((state) => state.pinnedRaces);
+
+  const pinnedRaces = useMemo(() => {
+    return [...pinnedRacesData].sort((a, b) => b.pinnedAt - a.pinnedAt);
+  }, [pinnedRacesData]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-red-900 to-black relative overflow-hidden">

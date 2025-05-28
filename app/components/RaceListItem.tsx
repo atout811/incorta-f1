@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import { useMemo } from "react";
 import { MapPin, Calendar, ChevronRight, Flag } from "lucide-react";
 import type { Race } from "../services/api";
 import { formatRaceDateShort } from "../utils/formatters";
@@ -10,8 +11,14 @@ interface RaceListItemProps {
 }
 
 export function RaceListItem({ race }: RaceListItemProps) {
-  const isPinned = useAppStore((state) => state.isPinned);
-  const pinned = isPinned(race.season, race.round);
+  const pinnedRaces = useAppStore((state) => state.pinnedRaces);
+
+  const pinned = useMemo(() => {
+    return pinnedRaces.some(
+      (pinnedRace) =>
+        pinnedRace.season === race.season && pinnedRace.round === race.round
+    );
+  }, [pinnedRaces, race.season, race.round]);
 
   return (
     <div className="group relative">
