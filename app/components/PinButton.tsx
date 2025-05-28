@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Pin, PinOff } from "lucide-react";
-import { usePinnedRaces } from "../hooks/usePinnedRaces";
+import { useAppStore } from "../store/pinnedRacesStore";
 import type { Race } from "../services/api";
 
 interface PinButtonProps {
@@ -9,7 +9,11 @@ interface PinButtonProps {
 }
 
 export function PinButton({ race, className = "" }: PinButtonProps) {
-  const { isPinned, pinRace, unpinRace } = usePinnedRaces();
+  const { isPinned, pinRace, unpinRace } = useAppStore((state) => ({
+    isPinned: state.isPinned,
+    pinRace: state.pinRace,
+    unpinRace: state.unpinRace,
+  }));
   const [isAnimating, setIsAnimating] = useState(false);
 
   const pinned = isPinned(race.season, race.round);

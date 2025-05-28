@@ -19,14 +19,6 @@ interface AppState {
   // Pinned races state
   pinnedRaces: PinnedRace[];
 
-  // Navigation state
-  lastVisitedSeason: string | null;
-  lastVisitedRace: { season: string; round: string } | null;
-
-  // App initialization state
-  isAppInitialized: boolean;
-  isAppReady: boolean;
-
   // UI preferences
   preferredView: "grid" | "list";
   itemsPerPage: number;
@@ -39,14 +31,6 @@ interface AppState {
   clearAllPinned: () => void;
   getPinnedCount: () => number;
   getPinnedRacesForSeason: (season: string) => PinnedRace[];
-
-  // Navigation actions
-  setLastVisitedSeason: (season: string | null) => void;
-  setLastVisitedRace: (race: { season: string; round: string } | null) => void;
-
-  // App initialization actions
-  setIsAppInitialized: (initialized: boolean) => void;
-  setIsAppReady: (ready: boolean) => void;
 
   // UI preference actions
   setPreferredView: (view: "grid" | "list") => void;
@@ -62,10 +46,6 @@ export const useAppStore = create<AppState>()(
       (set, get) => ({
         // Initial state
         pinnedRaces: [],
-        lastVisitedSeason: null,
-        lastVisitedRace: null,
-        isAppInitialized: false,
-        isAppReady: false,
         preferredView: "grid",
         itemsPerPage: 24,
 
@@ -128,26 +108,6 @@ export const useAppStore = create<AppState>()(
           set({ pinnedRaces: [] });
         },
 
-        // Navigation actions
-        setLastVisitedSeason: (season: string | null) => {
-          set({ lastVisitedSeason: season });
-        },
-
-        setLastVisitedRace: (
-          race: { season: string; round: string } | null
-        ) => {
-          set({ lastVisitedRace: race });
-        },
-
-        // App initialization actions
-        setIsAppInitialized: (initialized: boolean) => {
-          set({ isAppInitialized: initialized });
-        },
-
-        setIsAppReady: (ready: boolean) => {
-          set({ isAppReady: ready });
-        },
-
         // UI preference actions
         setPreferredView: (view: "grid" | "list") => {
           set({ preferredView: view });
@@ -161,10 +121,6 @@ export const useAppStore = create<AppState>()(
         resetState: () => {
           set({
             pinnedRaces: [],
-            lastVisitedSeason: null,
-            lastVisitedRace: null,
-            isAppInitialized: false,
-            isAppReady: false,
             preferredView: "grid",
             itemsPerPage: 24,
           });
@@ -211,11 +167,8 @@ export const useAppStore = create<AppState>()(
         // Only persist certain parts of the state
         partialize: (state) => ({
           pinnedRaces: state.pinnedRaces,
-          lastVisitedSeason: state.lastVisitedSeason,
-          lastVisitedRace: state.lastVisitedRace,
           preferredView: state.preferredView,
           itemsPerPage: state.itemsPerPage,
-          // Don't persist app initialization states
         }),
         // Add migration logic if needed in the future
         migrate: (persistedState: any, version: number) => {
@@ -229,5 +182,4 @@ export const useAppStore = create<AppState>()(
   )
 );
 
-// Keep the old export for backward compatibility during transition
 export const usePinnedRacesStore = useAppStore;

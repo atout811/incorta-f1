@@ -6,7 +6,6 @@ import { ViewToggle } from "../components/ViewToggle";
 import { RaceCard } from "../components/RaceCard";
 import { RaceListItem } from "../components/RaceListItem";
 import { f1Api, type Race } from "../services/api";
-import { useAppState } from "../hooks/usePinnedRaces";
 import { ArrowLeft, Calendar, Trophy, Target, Timer, Pin } from "lucide-react";
 
 export function meta({ params }: { params: { season: string } }) {
@@ -27,19 +26,10 @@ export default function SeasonDetails() {
   const [error, setError] = useState<string | null>(null);
   const [isVisible, setIsVisible] = useState(false);
 
-  const { setLastVisitedSeason } = useAppState();
-
   // Animation trigger
   useEffect(() => {
     setIsVisible(true);
   }, []);
-
-  // Set last visited season for persistent state
-  useEffect(() => {
-    if (season) {
-      setLastVisitedSeason(season);
-    }
-  }, [season, setLastVisitedSeason]);
 
   // Load races when season changes
   useEffect(() => {

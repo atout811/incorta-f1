@@ -7,7 +7,7 @@ import { ItemsPerPageSelector } from "../components/ItemsPerPageSelector";
 import { SeasonCard } from "../components/SeasonCard";
 import { SeasonListItem } from "../components/SeasonListItem";
 import { f1Api, type Season } from "../services/api";
-import { useAppState } from "../hooks/usePinnedRaces";
+import { useAppStore } from "../store/pinnedRacesStore";
 import { Calendar, Trophy, Zap } from "lucide-react";
 
 export function meta() {
@@ -31,7 +31,8 @@ export default function Seasons() {
   const [error, setError] = useState<string | null>(null);
   const [isVisible, setIsVisible] = useState(false);
 
-  const { preferredView, setPreferredView } = useAppState();
+  const preferredView = useAppStore((state) => state.preferredView);
+  const setPreferredView = useAppStore((state) => state.setPreferredView);
 
   // Animation trigger
   useEffect(() => {

@@ -3,14 +3,14 @@ import { MapPin, Calendar, ChevronRight, Flag } from "lucide-react";
 import type { Race } from "../services/api";
 import { formatRaceDateShort } from "../utils/formatters";
 import { PinButton } from "./PinButton";
-import { usePinnedRaces } from "../hooks/usePinnedRaces";
+import { useAppStore } from "../store/pinnedRacesStore";
 
 interface RaceListItemProps {
   race: Race;
 }
 
 export function RaceListItem({ race }: RaceListItemProps) {
-  const { isPinned } = usePinnedRaces();
+  const isPinned = useAppStore((state) => state.isPinned);
   const pinned = isPinned(race.season, race.round);
 
   return (

@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 import { Calendar, Trophy, Pin, Flag, Zap } from "lucide-react";
-import { usePinnedRaces } from "../hooks/usePinnedRaces";
+import { useAppStore } from "../store/pinnedRacesStore";
 import { RaceListItem } from "../components/RaceListItem";
 
 export function meta() {
@@ -15,7 +15,7 @@ export function meta() {
 }
 
 export default function Home() {
-  const { getPinnedRaces } = usePinnedRaces();
+  const getPinnedRaces = useAppStore((state) => state.getPinnedRaces);
   const pinnedRaces = getPinnedRaces();
 
   return (
@@ -156,6 +156,7 @@ export default function Home() {
                     raceName: race.raceName,
                     date: race.date,
                     time: "",
+                    url: "",
                     Circuit: {
                       circuitId: "",
                       url: "",
