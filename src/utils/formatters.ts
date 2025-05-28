@@ -23,41 +23,6 @@ export function formatRaceDateShort(race: Race): string {
   }
 }
 
-export function getDriverInitials(driver: Driver): string {
-  return `${driver.givenName[0]}${driver.familyName[0]}`;
-}
-
-export function getPositionSuffix(position: number): string {
-  const lastDigit = position % 10;
-  const lastTwoDigits = position % 100;
-
-  if (lastTwoDigits >= 11 && lastTwoDigits <= 13) {
-    return "th";
-  }
-
-  switch (lastDigit) {
-    case 1:
-      return "st";
-    case 2:
-      return "nd";
-    case 3:
-      return "rd";
-    default:
-      return "th";
-  }
-}
-
-export function formatPosition(position: string | number): string {
-  const pos = typeof position === "string" ? parseInt(position) : position;
-  if (isNaN(pos)) return position.toString();
-  return `${pos}${getPositionSuffix(pos)}`;
-}
-
-export function formatLapTime(timeString?: string): string {
-  if (!timeString) return "N/A";
-  return timeString;
-}
-
 export function getCountryFlag(nationality: string): string {
   const countryFlags: Record<string, string> = {
     British: "🇬🇧",

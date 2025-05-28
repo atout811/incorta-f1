@@ -143,25 +143,7 @@ export default function Home() {
               {pinnedRaces.slice(0, 4).map((race) => (
                 <RaceListItem
                   key={`${race.season}-${race.round}`}
-                  race={{
-                    season: race.season,
-                    round: race.round,
-                    raceName: race.raceName,
-                    date: race.date,
-                    time: "",
-                    url: "",
-                    Circuit: {
-                      circuitId: "",
-                      url: "",
-                      circuitName: race.circuitName,
-                      Location: {
-                        lat: "",
-                        long: "",
-                        locality: race.location.split(", ")[0] || "",
-                        country: race.location.split(", ")[1] || "",
-                      },
-                    },
-                  }}
+                  race={race}
                 />
               ))}
             </div>
