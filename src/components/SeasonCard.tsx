@@ -13,7 +13,7 @@ export function SeasonCard({ season }: SeasonCardProps) {
   return (
     <Link
       to={`/seasons/${season.season}`}
-      className="group w-full text-left relative bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl overflow-hidden transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 hover:bg-white/20 block"
+      className="group w-full text-left relative bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl overflow-hidden transition-all duration-500 transform  hover:bg-white/20 block"
     >
       {/* Gradient overlay on hover */}
       <div
@@ -92,8 +92,7 @@ export function SeasonCard({ season }: SeasonCardProps) {
           </div>
         )}
 
-        {/* Racing stripe animation */}
-        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-red-500 to-yellow-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+       
       </div>
     </Link>
   );

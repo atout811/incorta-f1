@@ -159,7 +159,7 @@ export default function Seasons() {
                 {seasons.map((season, index) => (
                   <div
                     key={season.season}
-                    className="transform transition-all duration-500 hover:scale-105"
+                    className="transform transition-all duration-500 "
                     style={{ animationDelay: `${index * 0.1}s` }}
                   >
                     <SeasonCard season={season} />
