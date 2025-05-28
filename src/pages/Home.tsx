@@ -1,19 +1,8 @@
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import { useMemo } from "react";
 import { Calendar, Trophy, Pin, Flag, Zap } from "lucide-react";
 import { useAppStore } from "../store/pinnedRacesStore";
 import { RaceListItem } from "../components/RaceListItem";
-
-export function meta() {
-  return [
-    { title: "F1 Explorer - Formula 1 Race Data Explorer" },
-    {
-      name: "description",
-      content:
-        "Explore Formula 1 race data, seasons, and pin your favorite races",
-    },
-  ];
-}
 
 export default function Home() {
   const pinnedRacesData = useAppStore((state) => state.pinnedRaces);

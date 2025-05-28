@@ -8,8 +8,8 @@ import {
   formatPosition,
   formatLapTime,
   getCountryFlag,
-} from "../../app/utils/formatters";
-import type { Driver, Race } from "../../app/services/api";
+} from "../utils/formatters";
+import type { Driver, Race } from "../services/api";
 
 describe("Formatters Utility Functions", () => {
   // Mock driver data

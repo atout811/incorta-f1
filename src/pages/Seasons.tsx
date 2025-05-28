@@ -10,29 +10,19 @@ import { f1Api, type Season } from "../services/api";
 import { useAppStore } from "../store/pinnedRacesStore";
 import { Calendar, Trophy, Zap } from "lucide-react";
 
-export function meta() {
-  return [
-    { title: "F1 Seasons - Formula 1 Explorer" },
-    {
-      name: "description",
-      content:
-        "Browse Formula 1 seasons and explore race schedules with pagination",
-    },
-  ];
-}
-
 export default function Seasons() {
   // Season listing state
   const [seasons, setSeasons] = useState<Season[]>([]);
-  const [seasonsView, setSeasonsView] = useState<"list" | "grid">("grid");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(24);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isVisible, setIsVisible] = useState(false);
 
+  // Use global store for user preferences
   const preferredView = useAppStore((state) => state.preferredView);
+  const itemsPerPage = useAppStore((state) => state.itemsPerPage);
   const setPreferredView = useAppStore((state) => state.setPreferredView);
+  const setItemsPerPage = useAppStore((state) => state.setItemsPerPage);
 
   // Animation trigger
   useEffect(() => {
@@ -48,11 +38,6 @@ export default function Seasons() {
   useEffect(() => {
     setCurrentPage(1);
   }, [itemsPerPage]);
-
-  // Use preferred view from persistent state
-  useEffect(() => {
-    setSeasonsView(preferredView);
-  }, [preferredView]);
 
   const loadSeasons = async () => {
     try {
@@ -89,7 +74,6 @@ export default function Seasons() {
   };
 
   const handleViewChange = (view: "list" | "grid") => {
-    setSeasonsView(view);
     setPreferredView(view);
   };
 
@@ -120,7 +104,7 @@ export default function Seasons() {
     );
   }
 
-  // Show seasons listing with pagination
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-red-900 to-black">
       {/* Animated Background Elements */}
@@ -179,7 +163,7 @@ export default function Seasons() {
             </div>
           </div>
 
-          <ViewToggle view={seasonsView} onViewChange={handleViewChange} />
+          <ViewToggle view={preferredView} onViewChange={handleViewChange} />
         </div>
 
         {/* Seasons content */}
@@ -191,7 +175,7 @@ export default function Seasons() {
                 : "opacity-0 translate-y-10"
             }`}
           >
-            {seasonsView === "grid" ? (
+            {preferredView === "grid" ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {paginatedSeasons.map((season, index) => (
                   <div

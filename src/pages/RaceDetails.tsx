@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useParams, Link } from "react-router";
+import { useParams, Link } from "react-router-dom";
 import {
   ArrowLeft,
   MapPin,
@@ -19,20 +19,6 @@ import {
   formatDriverName,
   getCountryFlag,
 } from "../utils/formatters";
-
-export function meta({
-  params,
-}: {
-  params: { season: string; round: string };
-}) {
-  return [
-    { title: `Race ${params.round} ${params.season} - Formula 1 Explorer` },
-    {
-      name: "description",
-      content: `View detailed race results for round ${params.round} of the ${params.season} Formula 1 season`,
-    },
-  ];
-}
 
 export default function RaceDetails() {
   const { season, round } = useParams<{ season: string; round: string }>();

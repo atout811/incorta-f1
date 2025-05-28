@@ -1,5 +1,5 @@
 import { Calendar, Trophy, ChevronRight } from "lucide-react";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import type { Season } from "../services/api";
 
 interface SeasonListItemProps {

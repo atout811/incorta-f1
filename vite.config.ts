@@ -7,6 +7,6 @@ export default defineConfig({
   base: "/incorta-f1/", // GitHub Pages base path (repository name)
   plugins: [tailwindcss(), react(), tsconfigPaths()],
   build: {
-    outDir: "build/client", // Keep same output directory for GitHub Actions
+    outDir: "dist", // Standard Vite output directory
   },
 });

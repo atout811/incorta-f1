@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import { useMemo } from "react";
 import { MapPin, Calendar, ChevronRight, Flag } from "lucide-react";
 import type { Race } from "../services/api";

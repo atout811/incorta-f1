@@ -1,30 +1,24 @@
 import { useState, useEffect, useMemo } from "react";
-import { useParams, Link } from "react-router";
+import { useParams, Link } from "react-router-dom";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { ErrorMessage } from "../components/ErrorMessage";
 import { ViewToggle } from "../components/ViewToggle";
 import { RaceCard } from "../components/RaceCard";
 import { RaceListItem } from "../components/RaceListItem";
 import { f1Api, type Race } from "../services/api";
+import { useAppStore } from "../store/pinnedRacesStore";
 import { ArrowLeft, Calendar, Trophy, Target, Timer, Pin } from "lucide-react";
-
-export function meta({ params }: { params: { season: string } }) {
-  return [
-    { title: `F1 ${params.season} Season - Formula 1 Explorer` },
-    {
-      name: "description",
-      content: `Explore the ${params.season} Formula 1 season races and championship data`,
-    },
-  ];
-}
 
 export default function SeasonDetails() {
   const { season } = useParams<{ season: string }>();
   const [races, setRaces] = useState<Race[]>([]);
-  const [racesView, setRacesView] = useState<"list" | "grid">("grid");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isVisible, setIsVisible] = useState(false);
+
+  // Use global store for user preferences
+  const preferredView = useAppStore((state) => state.preferredView);
+  const setPreferredView = useAppStore((state) => state.setPreferredView);
 
   // Animation trigger
   useEffect(() => {
@@ -161,7 +155,7 @@ export default function SeasonDetails() {
                 <span className="text-gray-300 ml-2">in {season}</span>
               </div>
             </div>
-            <ViewToggle view={racesView} onViewChange={setRacesView} />
+            <ViewToggle view={preferredView} onViewChange={setPreferredView} />
           </div>
         )}
 
@@ -174,7 +168,7 @@ export default function SeasonDetails() {
                 : "opacity-0 translate-y-10"
             }`}
           >
-            {racesView === "grid" ? (
+            {preferredView === "grid" ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {sortedRaces.map((race, index) => (
                   <div
