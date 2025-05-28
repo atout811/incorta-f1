@@ -23,7 +23,7 @@ export function RaceCard({ race }: RaceCardProps) {
   return (
     <Link
       to={`/race/${race.season}/${race.round}`}
-      className={`group block bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 hover:bg-white/20 transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 relative overflow-hidden ${
+      className={`group block bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6  relative overflow-hidden ${
         pinned ? "ring-2 ring-yellow-400 bg-white/15" : ""
       }`}
     >
@@ -32,7 +32,7 @@ export function RaceCard({ race }: RaceCardProps) {
 
       {/* Round badge */}
       <div className="relative mb-4">
-        <div className="absolute -top-2 -right-2 w-12 h-12 bg-gradient-to-br from-red-500 to-yellow-500 rounded-full flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300">
+        <div className="absolute -top-2 -right-2 w-12 h-12 bg-gradient-to-br from-red-500 to-yellow-500 rounded-full flex items-center justify-center transform ">
           <span className="text-white font-black text-sm">{race.round}</span>
         </div>
       </div>
@@ -88,8 +88,7 @@ export function RaceCard({ race }: RaceCardProps) {
         </div>
       </div>
 
-      {/* Racing stripe */}
-      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-red-500 to-yellow-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
+      
     </Link>
   );
 }

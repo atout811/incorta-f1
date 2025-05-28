@@ -1,3 +1,5 @@
+import axios from "axios";
+
 const BASE_URL = "https://ergast.com/api/f1";
 
 export interface Season {
@@ -85,82 +87,75 @@ export interface ApiResponse<T> {
   };
 }
 
-class F1ApiService {
-  private async fetchData<T>(endpoint: string): Promise<T[]> {
-    try {
-      const response = await fetch(`${BASE_URL}${endpoint}.json?limit=100`);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-
-      // Handle different Ergast API response structures
-      if (data.MRData) {
-        // Look for table objects first (SeasonTable, RaceTable, etc.)
-        const tableKeys = Object.keys(data.MRData).filter(
-          (key) =>
-            key.endsWith("Table") &&
-            data.MRData[key] &&
-            typeof data.MRData[key] === "object"
-        );
-
-        if (tableKeys.length > 0) {
-          const table = data.MRData[tableKeys[0]];
-          // Look for data arrays inside the table
-          const dataKeys = Object.keys(table).filter((key) =>
-            Array.isArray(table[key])
-          );
-          if (dataKeys.length > 0) {
-            return table[dataKeys[0]] as T[];
-          }
-        }
-
-        // Fallback: look for direct arrays in MRData
-        const directArrayKeys = Object.keys(data.MRData).filter((key) =>
-          Array.isArray(data.MRData[key])
-        );
-
-        if (directArrayKeys.length > 0) {
-          return data.MRData[directArrayKeys[0]] as T[];
-        }
-      }
-
-      return [];
-    } catch (error) {
-      console.error(`Error fetching data from ${endpoint}:`, error);
-      throw error;
-    }
-  }
-
-  async getSeasons(): Promise<Season[]> {
-    return this.fetchData<Season>("/seasons");
-  }
-
-  async getRaces(season: string): Promise<Race[]> {
-    return this.fetchData<Race>(`/${season}`);
-  }
-
-  async getRaceResults(season: string, round: string): Promise<Race[]> {
-    return this.fetchData<Race>(`/${season}/${round}/results`);
-  }
-
-  async getDriverStandings(season: string): Promise<any[]> {
-    return this.fetchData<any>(`/${season}/driverStandings`);
-  }
-
-  async getConstructorStandings(season: string): Promise<any[]> {
-    return this.fetchData<any>(`/${season}/constructorStandings`);
-  }
-
-  async getDrivers(season?: string): Promise<Driver[]> {
-    const endpoint = season ? `/${season}/drivers` : "/drivers";
-    return this.fetchData<Driver>(endpoint);
-  }
-
-  async getCircuits(season?: string): Promise<Circuit[]> {
-    const endpoint = season ? `/${season}/circuits` : "/circuits";
-    return this.fetchData<Circuit>(endpoint);
-  }
+export interface PaginationInfo {
+  limit: number;
+  offset: number;
+  total: number;
 }
 
-export const f1Api = new F1ApiService();
+function extractData<T>(response: any): T[] {
+  if (response.MRData) {
+    for (const key in response.MRData) {
+      if (Array.isArray(response.MRData[key])) {
+        return response.MRData[key] as T[];
+      }
+      if (
+        typeof response.MRData[key] === "object" &&
+        response.MRData[key] !== null
+      ) {
+        for (const nestedKey in response.MRData[key]) {
+          if (Array.isArray(response.MRData[key][nestedKey])) {
+            return response.MRData[key][nestedKey] as T[];
+          }
+        }
+      }
+    }
+  }
+  return [];
+}
+
+// Simple function to get pagination info from API response
+export function getPaginationInfo(response: any): PaginationInfo {
+  if (response.MRData) {
+    return {
+      limit: parseInt(response.MRData.limit) || 30,
+      offset: parseInt(response.MRData.offset) || 0,
+      total: parseInt(response.MRData.total) || 0,
+    };
+  }
+  return { limit: 30, offset: 0, total: 0 };
+}
+
+export async function getSeasonsWithPagination(
+  offset?: number
+): Promise<{ data: Season[]; pagination: PaginationInfo }> {
+  const url = offset
+    ? `${BASE_URL}/seasons.json?offset=${offset}`
+    : `${BASE_URL}/seasons.json`;
+  const response = await axios.get(url);
+  return {
+    data: extractData<Season>(response.data),
+    pagination: getPaginationInfo(response.data),
+  };
+}
+
+export async function getRaces(
+  season: string,
+  offset?: number
+): Promise<Race[]> {
+  const url = offset
+    ? `${BASE_URL}/${season}.json?offset=${offset}`
+    : `${BASE_URL}/${season}.json`;
+  const response = await axios.get(url);
+  return extractData<Race>(response.data);
+}
+
+export async function getRaceResults(
+  season: string,
+  round: string
+): Promise<Race[]> {
+  const response = await axios.get(
+    `${BASE_URL}/${season}/${round}/results.json`
+  );
+  return extractData<Race>(response.data);
+}

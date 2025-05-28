@@ -1,11 +1,6 @@
 import { Trophy, Clock, Zap, Target } from "lucide-react";
 import type { RaceResult } from "../services/api";
-import {
-  formatDriverName,
-  formatPosition,
-  formatLapTime,
-  getCountryFlag,
-} from "../utils/formatters";
+import { formatDriverName, getCountryFlag } from "../utils/formatters";
 
 interface RaceResultTableProps {
   results: RaceResult[];
@@ -89,9 +84,6 @@ export function RaceResultTable({ results }: RaceResultTableProps) {
 
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
-                    <span className="text-2xl mr-3 group-hover:scale-110 transition-transform duration-300">
-                      {getCountryFlag(result.Driver.nationality)}
-                    </span>
                     <div>
                       <div className="text-sm font-black text-white group-hover:text-yellow-400 transition-colors duration-300">
                         {formatDriverName(result.Driver)}

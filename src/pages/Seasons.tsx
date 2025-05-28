@@ -3,75 +3,62 @@ import { LoadingSpinner } from "../components/LoadingSpinner";
 import { ErrorMessage } from "../components/ErrorMessage";
 import { ViewToggle } from "../components/ViewToggle";
 import { Pagination } from "../components/Pagination";
-import { ItemsPerPageSelector } from "../components/ItemsPerPageSelector";
 import { SeasonCard } from "../components/SeasonCard";
 import { SeasonListItem } from "../components/SeasonListItem";
-import { f1Api, type Season } from "../services/api";
+import { getSeasonsWithPagination, type Season, type PaginationInfo } from "../services/api";
 import { useAppStore } from "../store/pinnedRacesStore";
 import { Calendar, Trophy, Zap } from "lucide-react";
 
 export default function Seasons() {
   // Season listing state
   const [seasons, setSeasons] = useState<Season[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const [currentOffset, setCurrentOffset] = useState(0);
+  const [pagination, setPagination] = useState<PaginationInfo>({
+    limit: 30,
+    offset: 0,
+    total: 0,
+  });
 
-  // Use global store for user preferences
-  const preferredView = useAppStore((state) => state.preferredView);
-  const itemsPerPage = useAppStore((state) => state.itemsPerPage);
-  const setPreferredView = useAppStore((state) => state.setPreferredView);
-  const setItemsPerPage = useAppStore((state) => state.setItemsPerPage);
+  // View state
+  const [currentView, setCurrentView] = useState<"card" | "list">("card");
 
-  // Animation trigger
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
+  // Pinned races state
+  const pinnedRaces = useAppStore((state) => state.pinnedRaces);
 
-  // Load seasons on component mount
-  useEffect(() => {
-    loadSeasons();
-  }, []);
-
-  // Reset to first page when items per page changes
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [itemsPerPage]);
-
-  const loadSeasons = async () => {
+  // Load seasons based on current offset
+  const loadSeasons = async (offset: number = 0) => {
     try {
       setLoading(true);
       setError(null);
-      const data = await f1Api.getSeasons();
-      // Sort seasons in descending order (most recent first)
-      const sortedSeasons = data.sort(
-        (a, b) => parseInt(b.season) - parseInt(a.season)
-      );
-      setSeasons(sortedSeasons);
+      const result = await getSeasonsWithPagination(offset);
+      setSeasons(result.data);
+      setPagination(result.pagination);
+      setCurrentOffset(offset);
     } catch (err) {
-      setError("Failed to load seasons. Please try again.");
-      console.error("Error loading seasons:", err);
+      setError(err instanceof Error ? err.message : "Failed to load seasons");
     } finally {
       setLoading(false);
     }
   };
 
-  // Pagination calculations
-  const totalPages = Math.ceil(seasons.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const paginatedSeasons = seasons.slice(startIndex, endIndex);
+  // Initial load
+  useEffect(() => {
+    loadSeasons();
+    const timer = setTimeout(() => setIsVisible(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    // Scroll to top when page changes
-    window.scrollTo({ top: 0, behavior: "smooth" });
+  // Handle offset change
+  const handleOffsetChange = (newOffset: number) => {
+    loadSeasons(newOffset);
   };
 
-  const handleItemsPerPageChange = (newItemsPerPage: number) => {
-    setItemsPerPage(newItemsPerPage);
-  };
+  // Use global store for user preferences
+  const preferredView = useAppStore((state) => state.preferredView);
+  const setPreferredView = useAppStore((state) => state.setPreferredView);
 
   const handleViewChange = (view: "list" | "grid") => {
     setPreferredView(view);
@@ -99,7 +86,7 @@ export default function Seasons() {
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-red-900 to-black flex items-center justify-center">
-        <ErrorMessage message={error} onRetry={loadSeasons} />
+        <ErrorMessage message={error} onRetry={() => loadSeasons(currentOffset)} />
       </div>
     );
   }
@@ -149,17 +136,9 @@ export default function Seasons() {
             <div className="flex items-center bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-6 py-3">
               <Trophy className="w-6 h-6 text-yellow-400 mr-3" />
               <span className="text-lg font-bold text-white">
-                {seasons.length} SEASONS
+                {pagination.total} SEASONS
               </span>
               <span className="text-gray-300 ml-2">available</span>
-            </div>
-
-            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-6 py-3">
-              <ItemsPerPageSelector
-                itemsPerPage={itemsPerPage}
-                onItemsPerPageChange={handleItemsPerPageChange}
-                options={[12, 24, 48, 96]}
-              />
             </div>
           </div>
 
@@ -167,7 +146,7 @@ export default function Seasons() {
         </div>
 
         {/* Seasons content */}
-        {paginatedSeasons.length > 0 && (
+        {seasons.length > 0 && (
           <div
             className={`mb-12 transition-all duration-1000 delay-500 ${
               isVisible
@@ -177,7 +156,7 @@ export default function Seasons() {
           >
             {preferredView === "grid" ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {paginatedSeasons.map((season, index) => (
+                {seasons.map((season, index) => (
                   <div
                     key={season.season}
                     className="transform transition-all duration-500 hover:scale-105"
@@ -189,7 +168,7 @@ export default function Seasons() {
               </div>
             ) : (
               <div className="space-y-3">
-                {paginatedSeasons.map((season, index) => (
+                {seasons.map((season, index) => (
                   <div
                     key={season.season}
                     className="transform transition-all duration-500"
@@ -211,11 +190,10 @@ export default function Seasons() {
         >
           <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6">
             <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-              itemsPerPage={itemsPerPage}
-              totalItems={seasons.length}
+              currentOffset={currentOffset}
+              limit={pagination.limit}
+              total={pagination.total}
+              onOffsetChange={handleOffsetChange}
             />
           </div>
         </div>

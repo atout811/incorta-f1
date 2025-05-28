@@ -24,11 +24,11 @@ export function RaceListItem({ race }: RaceListItemProps) {
     <div className="group relative">
       <Link
         to={`/race/${race.season}/${race.round}`}
-        className={`block p-3 sm:p-4 md:p-6 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl hover:bg-white/20 transition-all duration-500 transform hover:scale-[1.02] hover:-translate-y-1 ${
+        className={`block p-3 sm:p-4 md:p-6 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl ${
           pinned ? "bg-white/15 border-yellow-400 ring-1 ring-yellow-400" : ""
         }`}
       >
-        {/* Background gradient on hover */}
+    
         <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 to-yellow-500/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
         {/* Mobile Layout: Stack vertically */}
@@ -108,8 +108,7 @@ export function RaceListItem({ race }: RaceListItemProps) {
           </div>
         </div>
 
-        {/* Racing stripe on bottom */}
-        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-red-500 to-yellow-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+      
       </Link>
     </div>
   );

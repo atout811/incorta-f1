@@ -4,14 +4,9 @@ import {
   createJSONStorage,
   subscribeWithSelector,
 } from "zustand/middleware";
+import type { Race } from "../services/api";
 
-export interface PinnedRace {
-  season: string;
-  round: string;
-  raceName: string;
-  circuitName: string;
-  date: string;
-  location: string;
+interface PinnedRace extends Race {
   pinnedAt: number; // timestamp for sorting
 }
 

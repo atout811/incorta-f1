@@ -29,12 +29,7 @@ export function PinButton({ race, className = "" }: PinButtonProps) {
         unpinRace(race.season, race.round);
       } else {
         const pinnedRace = {
-          season: race.season,
-          round: race.round,
-          raceName: race.raceName,
-          circuitName: race.Circuit.circuitName,
-          date: race.date,
-          location: `${race.Circuit.Location.locality}, ${race.Circuit.Location.country}`,
+          ...race,
           pinnedAt: Date.now(),
         };
         pinRace(pinnedRace);

@@ -5,7 +5,7 @@ import { ErrorMessage } from "../components/ErrorMessage";
 import { ViewToggle } from "../components/ViewToggle";
 import { RaceCard } from "../components/RaceCard";
 import { RaceListItem } from "../components/RaceListItem";
-import { f1Api, type Race } from "../services/api";
+import { getRaces, type Race } from "../services/api";
 import { useAppStore } from "../store/pinnedRacesStore";
 import { ArrowLeft, Calendar, Trophy, Target, Timer, Pin } from "lucide-react";
 
@@ -14,18 +14,13 @@ export default function SeasonDetails() {
   const [races, setRaces] = useState<Race[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isVisible, setIsVisible] = useState(false);
 
-  // Use global store for user preferences
+
   const preferredView = useAppStore((state) => state.preferredView);
   const setPreferredView = useAppStore((state) => state.setPreferredView);
 
-  // Animation trigger
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
+  const pinnedRaces = useAppStore((state) => state.pinnedRaces);
 
-  // Load races when season changes
   useEffect(() => {
     if (season) {
       loadRaces(season);
@@ -36,7 +31,7 @@ export default function SeasonDetails() {
     try {
       setLoading(true);
       setError(null);
-      const data = await f1Api.getRaces(seasonYear);
+      const data = await getRaces(seasonYear);
       setRaces(data);
     } catch (err) {
       setError("Failed to load races for this season. Please try again.");
@@ -48,10 +43,27 @@ export default function SeasonDetails() {
 
   // Get sorted races with pinned ones first
   const sortedRaces = useMemo(() => {
-    return [...races].sort((a, b) => {
+    // First sort all races by round number
+    const racesSortedByRound = [...races].sort((a, b) => {
       return parseInt(a.round) - parseInt(b.round);
     });
-  }, [races]);
+
+    // If there are pinned races, separate them and put them first
+    if (pinnedRaces.length > 0) {
+      const unpinnedRaces = racesSortedByRound.filter((race) => {
+        return !pinnedRaces.some((pinnedRace) => pinnedRace.round === race.round);
+      });
+      
+      // Sort pinned races by round number as well
+      const sortedPinnedRaces = [...pinnedRaces].sort((a, b) => {
+        return parseInt(a.round) - parseInt(b.round);
+      });
+      
+      return [...sortedPinnedRaces, ...unpinnedRaces];
+    }
+
+    return racesSortedByRound;
+  }, [races, pinnedRaces]);
 
   if (loading) {
     return (
@@ -83,16 +95,6 @@ export default function SeasonDetails() {
     );
   }
 
-  const currentDate = new Date();
-  const upcomingRaces = races.filter((race) => {
-    const raceDate = new Date(`${race.date}T${race.time || "00:00:00"}`);
-    return raceDate > currentDate;
-  });
-
-  const completedRaces = races.filter((race) => {
-    const raceDate = new Date(`${race.date}T${race.time || "00:00:00"}`);
-    return raceDate <= currentDate;
-  });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-red-900 to-black">
@@ -114,9 +116,7 @@ export default function SeasonDetails() {
 
         {/* Season header */}
         <div
-          className={`mb-12 transition-all duration-1000 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-          }`}
+          className={`mb-12 transition-all duration-1000 `}
         >
           <div className="relative bg-gradient-to-r from-red-600/20 to-yellow-600/20 backdrop-blur-sm rounded-3xl p-8 border border-white/20">
             <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 to-yellow-500/10 rounded-3xl animate-pulse"></div>
@@ -140,11 +140,7 @@ export default function SeasonDetails() {
         {/* Race view controls */}
         {races.length > 0 && (
           <div
-            className={`flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-8 transition-all duration-1000 delay-300 ${
-              isVisible
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-10"
-            }`}
+            className={`flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-8 transition-all duration-1000 delay-300 `}
           >
             <div className="flex items-center gap-4">
               <div className="flex items-center bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-6 py-3">
@@ -162,18 +158,13 @@ export default function SeasonDetails() {
         {/* Races content */}
         {!loading && !error && races.length > 0 && (
           <div
-            className={`transition-all duration-1000 delay-500 ${
-              isVisible
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-10"
-            }`}
+            className={`transition-all duration-1000 delay-500`}
           >
             {preferredView === "grid" ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {sortedRaces.map((race, index) => (
                   <div
                     key={`${race.season}-${race.round}`}
-                    className="transform transition-all duration-500 hover:scale-105"
                     style={{ animationDelay: `${index * 0.1}s` }}
                   >
                     <RaceCard race={race} />
@@ -182,10 +173,10 @@ export default function SeasonDetails() {
               </div>
             ) : (
               <div className="space-y-3">
+                
                 {sortedRaces.map((race, index) => (
                   <div
                     key={`${race.season}-${race.round}`}
-                    className="transform transition-all duration-500"
                     style={{ animationDelay: `${index * 0.05}s` }}
                   >
                     <RaceListItem race={race} />
