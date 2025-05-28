@@ -10,17 +10,15 @@ interface RaceListItemProps {
 }
 
 export function RaceListItem({ race }: RaceListItemProps) {
-  const { isPinned, isHydrated } = usePinnedRaces();
-  const pinned = isHydrated ? isPinned(race.season, race.round) : false;
+  const { isPinned } = usePinnedRaces();
+  const pinned = isPinned(race.season, race.round);
 
   return (
     <div className="group relative">
       <Link
         to={`/race/${race.season}/${race.round}`}
         className={`block p-3 sm:p-4 md:p-6 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl hover:bg-white/20 transition-all duration-500 transform hover:scale-[1.02] hover:-translate-y-1 ${
-          pinned && isHydrated
-            ? "bg-white/15 border-yellow-400 ring-1 ring-yellow-400"
-            : ""
+          pinned ? "bg-white/15 border-yellow-400 ring-1 ring-yellow-400" : ""
         }`}
       >
         {/* Background gradient on hover */}
@@ -45,7 +43,7 @@ export function RaceListItem({ race }: RaceListItemProps) {
                   {race.raceName}
                 </h3>
                 {/* Pinned indicator */}
-                {pinned && isHydrated && (
+                {pinned && (
                   <div className="inline-flex items-center bg-gradient-to-r from-yellow-400 to-orange-500 text-black text-xs font-black px-2 py-1 rounded-full shadow-lg self-start sm:self-auto">
                     ⭐ PINNED
                   </div>
